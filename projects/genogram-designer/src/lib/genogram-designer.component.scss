@@ -1,0 +1,7 @@
+@import './styles/variables';
+
+.genogram {
+    &__canvas {
+        background-color: $background-color;
+    }
+}
