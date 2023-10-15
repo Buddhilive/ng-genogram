@@ -1,11 +1,8 @@
 export const SVG_SHAPES = {
-    BASE_NODE: `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200">
-       <foreignObject width="100%" height="100%">
-          <div xmlns="http://www.w3.org/1999/xhtml" style="font-size:50px">
-             Simply Easy 
-             <span style="color:blue;">
-             Learning</span>
-          </div>
-       </foreignObject>
-    </svg>`
+   BASE_NODE: `<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+    <g>
+     <title>Layer 1</title>
+     <rect stroke="#000" id="svg_1" height="91" width="87" y="4.5" x="6.5" fill="#11c4c4"/>
+    </g>
+   </svg>`
 };

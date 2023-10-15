@@ -1,1 +1,8 @@
-<canvas #genogramCanvas class="genogram__canvas" (click)="canvasClick($event)"></canvas>
+<canvas
+  #genogramCanvas
+  class="genogram__canvas"
+  (contextmenu)="canvasClick($event)"
+  (mousedown)="canvasMouseDown($event)"
+  (mousemove)="canvasMouseMove($event)"
+  (mouseup)="canvasMouseUp($event)"
+></canvas>
