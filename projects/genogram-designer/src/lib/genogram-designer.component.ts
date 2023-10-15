@@ -1,6 +1,7 @@
 import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { SVG_SHAPES } from './data/shapes';
 import { CanvasShapeItem, SelectedCanvasItem } from './interfaces';
+import { DomHandlerService, EventHandlerService } from './services';
 
 @Component({
   selector: 'genogram-designer',
@@ -13,6 +14,8 @@ export class GenogramDesignerComponent {
   @Input() height = 300;
 
   @ViewChild('genogramCanvas') genogramCanvas!: ElementRef<SVGElement>;
+
+  currentViewBox = [0, 0, 200, 200];
 
   genogramCtx!: any;
 
@@ -27,6 +30,9 @@ export class GenogramDesignerComponent {
 
   isDraggable = false;
 
+  constructor(private domHandlerService: DomHandlerService,
+    private eventHandlerService: EventHandlerService) {}
+
   ngAfterViewInit(): void {
     this.canvasItems.push({
       svg: 'rect',
@@ -39,29 +45,31 @@ export class GenogramDesignerComponent {
   }
 
   generateShape(shape: CanvasShapeItem) {
-    const svgShape = document.createElementNS('http://www.w3.org/2000/svg', shape.svg);
+    /* const svgShape = document.createElementNS('http://www.w3.org/2000/svg', shape.svg);
     svgShape.setAttribute('width', shape.width.toString());
     svgShape.setAttribute('height', shape.height.toString());
     svgShape.setAttribute('x', shape.posX.toString());
     svgShape.setAttribute('y', shape.posY.toString());
     svgShape.setAttribute('fill', 'blue');
-    svgShape.classList.add('draggable');
+    svgShape.classList.add('draggable'); */
+    const svgShape = this.domHandlerService.generateComponent('base', shape.posX, shape.posY);
 
     return svgShape;
   }
 
-  addEvents(shape: SVGElement) {
-    // shape.addEventListener('click', this.rectClick);
+  addEvents(shape: SVGGElement) {
+    // shape.addEventListener('click', this.rectClick.bind(this));
     shape.addEventListener('mousedown', (evt: MouseEvent) => this.shapeMouseDown(evt));
     shape.addEventListener('mousemove', (evt: MouseEvent) => this.shapeMouseMove(evt));
     shape.addEventListener('mouseup', (evt: MouseEvent) => this.shapeMouseUp(evt));
-    shape.addEventListener('mouseover', (evt: MouseEvent) => this.shapeMouseOver(evt));
+    // shape.addEventListener('mouseover', (evt: MouseEvent) => this.shapeMouseOver(evt));
     return shape;
   }
 
   renderCanvas(shapes: Array<CanvasShapeItem>) {
     for (const shape of shapes) {
       let svgShape = this.generateShape(shape);
+      svgShape = this.eventHandlerService.addCommonEvents(svgShape);
       svgShape = this.addEvents(svgShape);
       this.genogramCanvas.nativeElement.appendChild(svgShape);
     }
@@ -93,8 +101,37 @@ export class GenogramDesignerComponent {
     this.isDraggable = false;
   }
 
+  zoomCanvas(evt: WheelEvent) {
+    evt.preventDefault();
+
+    const zoomSpeed = 1.1;
+    const deltaY = evt.deltaY;
+    const oldWidth = this.currentViewBox[2];
+    const oldHeight = this.currentViewBox[3];
+    const newWidth = oldWidth / (deltaY > 0 ? zoomSpeed : 1 / zoomSpeed);
+    const newHeight = oldHeight / (deltaY > 0 ? zoomSpeed : 1 / zoomSpeed);
+    const deltaWidth = (newWidth - oldWidth) / 2;
+    const deltaHeight = (newHeight - oldHeight) / 2;
+
+    this.currentViewBox = [
+      this.currentViewBox[0] - deltaWidth,
+      this.currentViewBox[1] - deltaHeight,
+      newWidth,
+      newHeight
+    ];
+
+    this.genogramCanvas.nativeElement.setAttribute('viewBox', this.currentViewBox.join(' '));
+  }
+
   rectClick() {
-    alert('Namo Buddhaya!');
+    this.canvasItems.push({
+      svg: 'rect',
+      width: 100,
+      height: 100,
+      posX: 0,
+      posY: 0
+    });
+    this.renderCanvas(this.canvasItems);
   }
 
 }
