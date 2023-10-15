@@ -45,24 +45,15 @@ export class GenogramDesignerComponent {
   }
 
   generateShape(shape: CanvasShapeItem) {
-    /* const svgShape = document.createElementNS('http://www.w3.org/2000/svg', shape.svg);
-    svgShape.setAttribute('width', shape.width.toString());
-    svgShape.setAttribute('height', shape.height.toString());
-    svgShape.setAttribute('x', shape.posX.toString());
-    svgShape.setAttribute('y', shape.posY.toString());
-    svgShape.setAttribute('fill', 'blue');
-    svgShape.classList.add('draggable'); */
     const svgShape = this.domHandlerService.generateComponent('base', shape.posX, shape.posY);
 
     return svgShape;
   }
 
   addEvents(shape: SVGGElement) {
-    // shape.addEventListener('click', this.rectClick.bind(this));
     shape.addEventListener('mousedown', (evt: MouseEvent) => this.shapeMouseDown(evt));
     shape.addEventListener('mousemove', (evt: MouseEvent) => this.shapeMouseMove(evt));
     shape.addEventListener('mouseup', (evt: MouseEvent) => this.shapeMouseUp(evt));
-    // shape.addEventListener('mouseover', (evt: MouseEvent) => this.shapeMouseOver(evt));
     return shape;
   }
 
@@ -92,11 +83,6 @@ export class GenogramDesignerComponent {
     }
   }
 
-  shapeMouseOver(evt: any) {
-    // evt.target.setAttributes('fill', 'red');
-    console.log(evt.target.fill);
-  }
-
   shapeMouseUp(evt: MouseEvent) {
     this.isDraggable = false;
   }
@@ -122,16 +108,4 @@ export class GenogramDesignerComponent {
 
     this.genogramCanvas.nativeElement.setAttribute('viewBox', this.currentViewBox.join(' '));
   }
-
-  rectClick() {
-    this.canvasItems.push({
-      svg: 'rect',
-      width: 100,
-      height: 100,
-      posX: 0,
-      posY: 0
-    });
-    this.renderCanvas(this.canvasItems);
-  }
-
 }
