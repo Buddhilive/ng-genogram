@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
+import { DialogHandlerService } from './dialog-handler.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EventHandlerService {
 
-  constructor() { }
+  constructor(private dialogHandlerService: DialogHandlerService) { }
 
   addCommonEvents(svgElement: SVGGElement) {
     svgElement.addEventListener('mouseenter', () => {
@@ -30,6 +31,6 @@ export class EventHandlerService {
   }
 
   private nodeClickEvent() {
-    alert('Namo Buddhaya!');
+    this.dialogHandlerService.openRelationShipDialog()
   }
 }
