@@ -4,4 +4,12 @@
     &__canvas {
         background-color: $background-color;
     }
+    &__dialog {
+        border: 1px solid #C4C6D0;
+        border-radius: 8px;
+        &::backdrop {
+            background-color: #1A1B1F;
+            opacity: 0.5;
+        }
+    }
 }

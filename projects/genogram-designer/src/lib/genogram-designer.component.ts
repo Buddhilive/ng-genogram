@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild, ViewEncapsulation } from '@angular/core';
 import { SVG_SHAPES } from './data/shapes';
 import { CanvasShapeItem, SelectedCanvasItem } from './interfaces';
 import { DomHandlerService, EventHandlerService } from './services';
@@ -6,7 +6,8 @@ import { DomHandlerService, EventHandlerService } from './services';
 @Component({
   selector: 'genogram-designer',
   templateUrl: './genogram-designer.component.html',
-  styleUrls: ['./genogram-designer.component.scss']
+  styleUrls: ['./genogram-designer.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class GenogramDesignerComponent {
 
