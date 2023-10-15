@@ -1,8 +1,7 @@
-<canvas
+<svg
+  [attr.width]="width"
+  [attr.height]="height"
   #genogramCanvas
   class="genogram__canvas"
-  (contextmenu)="canvasClick($event)"
-  (mousedown)="canvasMouseDown($event)"
-  (mousemove)="canvasMouseMove($event)"
-  (mouseup)="canvasMouseUp($event)"
-></canvas>
+  xmlns="http://www.w3.org/2000/svg"
+></svg>

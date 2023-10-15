@@ -12,98 +12,89 @@ export class GenogramDesignerComponent {
   @Input() width = 300;
   @Input() height = 300;
 
-  @ViewChild('genogramCanvas') genogramCanvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('genogramCanvas') genogramCanvas!: ElementRef<SVGElement>;
 
   genogramCtx!: any;
 
   canvasItems: Array<CanvasShapeItem> = [];
 
-  selectedItem!: SelectedCanvasItem | null;
+  selectedElement!: any;
+
+  shapeOffsets: SelectedCanvasItem = {
+    posX: 0,
+    posY: 0
+  };
+
+  isDraggable = false;
 
   ngAfterViewInit(): void {
-    this.genogramCtx = this.genogramCanvas.nativeElement.getContext('2d');
-    this.genogramCanvas.nativeElement.width = this.width;
-    this.genogramCanvas.nativeElement.height = this.height;
     this.canvasItems.push({
-      svg: SVG_SHAPES.BASE_NODE,
-      posX: 25,
-      posY: 70,
+      svg: 'rect',
+      width: 100,
       height: 100,
-      width: 100
+      posX: 20,
+      posY: 50
     });
     this.renderCanvas(this.canvasItems);
   }
 
-  drawShape(shape: CanvasShapeItem) {
-    const DOMURL = window.URL || window.webkitURL || window;
-    const imgObj = new Image();
-    const svg = new Blob([shape.svg], { type: 'image/svg+xml' });
-    const url = DOMURL.createObjectURL(svg);
-    imgObj.src = url;
-    imgObj.onload = () => {
-      this.genogramCtx.drawImage(imgObj, shape.posX, shape.posY);
-      DOMURL.revokeObjectURL(url);
-    }
+  generateShape(shape: CanvasShapeItem) {
+    const svgShape = document.createElementNS('http://www.w3.org/2000/svg', shape.svg);
+    svgShape.setAttribute('width', shape.width.toString());
+    svgShape.setAttribute('height', shape.height.toString());
+    svgShape.setAttribute('x', shape.posX.toString());
+    svgShape.setAttribute('y', shape.posY.toString());
+    svgShape.setAttribute('fill', 'blue');
+    svgShape.classList.add('draggable');
+
+    return svgShape;
   }
 
-  canvasMouseDown(evt: MouseEvent) {
-    const itemIndex = this.getSelectedShape(evt);
-    if (itemIndex >= 0) {
-      this.selectedItem = {
-        index: itemIndex,
-        posX: evt.x - this.canvasItems[itemIndex].posX,
-        posY: evt.y - this.canvasItems[itemIndex].posY
-      }
-    }
-    console.log(this.selectedItem);
-  }
-
-  canvasMouseMove(evt: MouseEvent) {
-    if(this.selectedItem != null) {
-      this.canvasItems[this.selectedItem.index].posX = evt.x - this.selectedItem.posX;
-      this.canvasItems[this.selectedItem.index].posY = evt.y - this.selectedItem.posY;
-      this.renderCanvas(this.canvasItems);
-    }
-  }
-
-  canvasMouseUp(evt: MouseEvent) {
-    this.selectedItem = null;
-  }
-
-  getSelectedShape(mousePos: MouseEvent) {
-    for (let i = 0; i < this.canvasItems.length; i++) {
-      if (mousePos.x > this.canvasItems[i].posX &&
-        mousePos.x < (this.canvasItems[i].posX + this.canvasItems[i].width) &&
-        mousePos.y > this.canvasItems[i].posY &&
-        mousePos.y < (this.canvasItems[i].posY + this.canvasItems[i].height)) {
-        return i;
-      }
-    }
-    return NaN;
+  addEvents(shape: SVGElement) {
+    // shape.addEventListener('click', this.rectClick);
+    shape.addEventListener('mousedown', (evt: MouseEvent) => this.shapeMouseDown(evt));
+    shape.addEventListener('mousemove', (evt: MouseEvent) => this.shapeMouseMove(evt));
+    shape.addEventListener('mouseup', (evt: MouseEvent) => this.shapeMouseUp(evt));
+    shape.addEventListener('mouseover', (evt: MouseEvent) => this.shapeMouseOver(evt));
+    return shape;
   }
 
   renderCanvas(shapes: Array<CanvasShapeItem>) {
-    this.genogramCtx.save();
-    this.genogramCtx.setTransform(1, 0, 0, 1, 0, 0);
-    this.genogramCtx.clearRect(0, 0, this.width, this.height);
-    this.genogramCtx.restore();
-    for (let shape of shapes) {
-      this.drawShape(shape);
+    for (const shape of shapes) {
+      let svgShape = this.generateShape(shape);
+      svgShape = this.addEvents(svgShape);
+      this.genogramCanvas.nativeElement.appendChild(svgShape);
     }
   }
 
-  canvasClick(evt: any) {
-    // console.log(evt);
-    /* this.genogramCtx.scale(0.5, 0.5);
-     */
-    this.canvasItems.push({
-      svg: SVG_SHAPES.BASE_NODE,
-      posX: 0,
-      posY: 0,
-      height: 100,
-      width: 100
-    });
-    this.renderCanvas(this.canvasItems);
-    return null;
+  shapeMouseDown(evt: MouseEvent) {
+    this.isDraggable = true;
+    this.selectedElement = evt.target;
+    const bbox = this.selectedElement.getBBox();
+    this.shapeOffsets.posX = evt.clientX - bbox.x;
+    this.shapeOffsets.posY = evt.clientY - bbox.y;
   }
+
+  shapeMouseMove(evt: MouseEvent) {
+    if (this.isDraggable) {
+      const x = evt.clientX - this.shapeOffsets.posX;
+      const y = evt.clientY - this.shapeOffsets.posY;
+      this.selectedElement.setAttribute('x', x);
+      this.selectedElement.setAttribute('y', y);
+    }
+  }
+
+  shapeMouseOver(evt: any) {
+    // evt.target.setAttributes('fill', 'red');
+    console.log(evt.target.fill);
+  }
+
+  shapeMouseUp(evt: MouseEvent) {
+    this.isDraggable = false;
+  }
+
+  rectClick() {
+    alert('Namo Buddhaya!');
+  }
+
 }
