@@ -1,2 +1,2 @@
-export * from './canvas-items.interface';
+export * from './symbols.interface';
 export * from './selecteditem.interface';

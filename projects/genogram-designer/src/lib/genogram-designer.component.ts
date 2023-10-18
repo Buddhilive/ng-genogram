@@ -1,5 +1,4 @@
 import { Component, ElementRef, Input, ViewChild, ViewEncapsulation } from '@angular/core';
-import { SVG_SHAPES } from './data/shapes';
 import { CanvasShapeItem, SelectedCanvasItem } from './interfaces';
 import { DomHandlerService, EventHandlerService } from './services';
 
